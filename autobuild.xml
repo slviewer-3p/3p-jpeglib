@@ -35,6 +35,11 @@
               <string>default</string>
             </map>
           </map>
+          <key>manifest</key>
+          <array>
+            <string>include/jpeglib/*.h</string>
+            <string>LICENSES/jpeglib.txt</string>
+          </array>
           <key>name</key>
           <string>common</string>
         </map>
@@ -95,6 +100,10 @@
               <string>default</string>
             </map>
           </map>
+          <key>manifest</key>
+          <array>
+            <string>lib/release/jpeglib.lib</string>
+          </array>
           <key>name</key>
           <string>windows</string>
         </map>
