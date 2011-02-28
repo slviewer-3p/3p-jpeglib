@@ -8,7 +8,7 @@ set -x
 set -e
 
 JPEGLIB_VERSION="8c"
-JPEGLIB_SOURCE_DIR=""
+JPEGLIB_SOURCE_DIR="jpeg-$JPEGLIB_VERSION"
 
 if [ -z "$AUTOBUILD" ] ; then 
     fail
