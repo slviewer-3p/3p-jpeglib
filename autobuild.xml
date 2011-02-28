@@ -60,6 +60,10 @@
               <string>default</string>
             </map>
           </map>
+          <key>manifest</key>
+          <array>
+            <string>lib/libjpeg.a</string>
+          </array>
           <key>name</key>
           <string>darwin</string>
         </map>
