@@ -52,8 +52,11 @@ pushd "$JPEGLIB_SOURCE_DIR"
             CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
             make
             make install
-			mkdir -p "$stage/include/jpeglib"
-			mv "$stage/include/"*.h "$stage/include/jpeglib/"
+            mv "$stage/lib" "$stage/release"
+            mkdir -p "$stage/lib"
+            mv "$stage/release" "$stage/lib"
+            mkdir -p "$stage/include/jpeglib"
+            mv "$stage/include/"*.h "$stage/include/jpeglib/"
         ;;
     esac
     mkdir -p "$stage/LICENSES"
