@@ -24,6 +24,10 @@ eval "$("$AUTOBUILD" source_environment)"
 set -x
 
 stage="$(pwd)/stage"
+
+build=${AUTOBUILD_BUILD_ID:=0}
+echo "${JPEGLIB_VERSION}.${build}" > "${stage}/VERSION.txt"
+
 pushd "$JPEGLIB_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         "windows")
