@@ -46,6 +46,10 @@ pushd "$JPEGLIB_SOURCE_DIR"
             cp {jconfig.h,jerror.h,jinclude.h,jmorecfg.h,jpeglib.h} "$stage/include/jpeglib"
         ;;
         "darwin")
+            opts="-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.9.sdk -mmacosx-version-min=10.7"
+            export CFLAGS="$opts" 
+            export CPPFLAGS="$opts" 
+            export LDFLAGS="$opts"
             ./configure --prefix="$stage"
             make
             make install
