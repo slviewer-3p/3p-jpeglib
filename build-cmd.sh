@@ -33,7 +33,7 @@ pushd "$JPEGLIB_SOURCE_DIR"
         "windows")
             load_vsvars
             
-            nmake -f makefile.vc setup-v10
+            nmake -f makefile.vc setup-v12
             
             build_sln "jpeg.sln" "Release|Win32" 
 

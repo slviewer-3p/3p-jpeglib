@@ -9,7 +9,7 @@
 # To build an optimized library without debug info, say "nmake nodebug=1".
 
 # Pull in standard variable definitions
-!include <win32.mak>
+#!include <win32.mak>
 
 # You may want to adjust these compiler options:
 CFLAGS= $(cflags) $(cdebug) $(cvars) -I.
@@ -170,6 +170,24 @@ setup-v10:
 	ren makerfil.v10 rdjpgcom.vcxproj.filters
 	ren makewvcx.v10 wrjpgcom.vcxproj
 	ren makewfil.v10 wrjpgcom.vcxproj.filters
+
+
+setup-v12:
+	ren jconfig.vc jconfig.h
+	ren makejsln.v12 jpeg.sln
+	ren makeasln.v12 apps.sln
+	ren makejvcx.v12 jpeg.vcxproj
+	ren makejfil.v12 jpeg.vcxproj.filters
+	ren makecvcx.v12 cjpeg.vcxproj
+	ren makecfil.v12 cjpeg.vcxproj.filters
+	ren makedvcx.v12 djpeg.vcxproj
+	ren makedfil.v12 djpeg.vcxproj.filters
+	ren maketvcx.v12 jpegtran.vcxproj
+	ren maketfil.v12 jpegtran.vcxproj.filters
+	ren makervcx.v12 rdjpgcom.vcxproj
+	ren makerfil.v12 rdjpgcom.vcxproj.filters
+	ren makewvcx.v12 wrjpgcom.vcxproj
+	ren makewfil.v12 wrjpgcom.vcxproj.filters
 
 test:
 	IF EXIST testout* $(RM) testout*
