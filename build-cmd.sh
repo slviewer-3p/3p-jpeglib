@@ -20,6 +20,12 @@ fi
 
 # load autbuild provided shell functions and variables
 set +x
+case "$AUTOBUILD_PLATFORM" in
+    windows*)
+        AUTOBUILD="$(cygpath -u "$AUTOBUILD")"
+    ;;
+esac
+
 eval "$("$AUTOBUILD" source_environment)"
 set -x
 
@@ -30,18 +36,20 @@ echo "${JPEGLIB_VERSION}.${build}" > "${stage}/VERSION.txt"
 
 pushd "$JPEGLIB_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
-        "windows")
+        windows*)
             load_vsvars
             
             nmake -f makefile.vc setup-v12
             
-            build_sln "jpeg.sln" "Release|Win32" 
+            build_sln "jpeg.sln" "Release|$AUTOBUILD_WIN_VSPLATFORM" "jpeg"
 
-            mkdir -p "$stage/lib/debug"
             mkdir -p "$stage/lib/release"
-            cp "Release\jpeg.lib" \
-                "$stage/lib/release/jpeglib.lib"
-                
+
+            if [ "$AUTOBUILD_ADDRSIZE" = 32 ]
+            then cp "Release\jpeg.lib" "$stage/lib/release/jpeglib.lib"
+            else cp "x64\Release\jpeg.lib" "$stage/lib/release/jpeglib.lib"
+            fi
+
             mkdir -p "$stage/include/jpeglib"
             cp {jconfig.h,jerror.h,jinclude.h,jmorecfg.h,jpeglib.h} "$stage/include/jpeglib"
         ;;
