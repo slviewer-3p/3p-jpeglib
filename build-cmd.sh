@@ -6,6 +6,8 @@ cd "$(dirname "$0")"
 set -x
 # make errors fatal
 set -e
+# complain about unset env variables
+set -u
 
 JPEGLIB_VERSION="8c"
 JPEGLIB_SOURCE_DIR="jpeg-$JPEGLIB_VERSION"
@@ -15,19 +17,18 @@ if [ -z "$AUTOBUILD" ] ; then
 fi
 
 if [ "$OSTYPE" = "cygwin" ] ; then
-    export AUTOBUILD="$(cygpath -u $AUTOBUILD)"
+    autobuild="$(cygpath -u $AUTOBUILD)"
+else
+    autobuild="$AUTOBUILD"
 fi
 
 # load autbuild provided shell functions and variables
 set +x
-case "$AUTOBUILD_PLATFORM" in
-    windows*)
-        AUTOBUILD="$(cygpath -u "$AUTOBUILD")"
-    ;;
-esac
-
-eval "$("$AUTOBUILD" source_environment)"
+eval "$("$autobuild" source_environment)"
 set -x
+
+# set LL_BUILD and friends
+set_build_variables convenience Release
 
 stage="$(pwd)/stage"
 
@@ -38,9 +39,18 @@ pushd "$JPEGLIB_SOURCE_DIR"
     case "$AUTOBUILD_PLATFORM" in
         windows*)
             load_vsvars
-            
-            nmake -f makefile.vc setup-v12
-            
+
+            case "${AUTOBUILD_VSVER:-}" in
+                "120")
+                    target="setup-v12"
+                    ;;
+                *)
+                    fail "Unrecognized AUTOBUILD_VSVER = '${AUTOBUILD_VSVER:-}'"
+                    ;;
+            esac
+
+            nmake -f makefile.vc "$target"
+
             build_sln "jpeg.sln" "Release|$AUTOBUILD_WIN_VSPLATFORM" "jpeg"
 
             mkdir -p "$stage/lib/release"
@@ -53,8 +63,8 @@ pushd "$JPEGLIB_SOURCE_DIR"
             mkdir -p "$stage/include/jpeglib"
             cp {jconfig.h,jerror.h,jinclude.h,jmorecfg.h,jpeglib.h} "$stage/include/jpeglib"
         ;;
-        "darwin")
-            opts="-arch i386 -iwithsysroot /Developer/SDKs/MacOSX10.9.sdk -mmacosx-version-min=10.7"
+        darwin*)
+            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
             export CFLAGS="$opts" 
             export CPPFLAGS="$opts" 
             export LDFLAGS="$opts"
@@ -67,8 +77,9 @@ pushd "$JPEGLIB_SOURCE_DIR"
             mkdir -p "$stage/include/jpeglib"
             mv "$stage/include/"*.h "$stage/include/jpeglib/"
         ;;
-        "linux")
-            CFLAGS="-m32" CXXFLAGS="-m32" ./configure --prefix="$stage"
+        linux*)
+            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD"
+            CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage"
             make
             make install
             mv "$stage/lib" "$stage/release"
