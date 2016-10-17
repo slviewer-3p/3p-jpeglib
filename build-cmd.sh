@@ -22,12 +22,12 @@ else
     autobuild="$AUTOBUILD"
 fi
 
+stage="$(pwd)/stage"
+
 # load autbuild provided shell functions and variables
 source_environment_tempfile="$stage/source_environment.sh"
 "$autobuild" source_environment > "$source_environment_tempfile"
 . "$source_environment_tempfile"
-
-stage="$(pwd)/stage"
 
 build=${AUTOBUILD_BUILD_ID:=0}
 echo "${JPEGLIB_VERSION}.${build}" > "${stage}/VERSION.txt"
