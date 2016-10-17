@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 cd "$(dirname "$0")"
 
 # turn on verbose debugging output for parabuild logs.
-set -x
+exec 4>&1; export BASH_XTRACEFD=4; set -x
 # make errors fatal
 set -e
 # complain about unset env variables
@@ -13,7 +13,7 @@ JPEGLIB_VERSION="8c"
 JPEGLIB_SOURCE_DIR="jpeg-$JPEGLIB_VERSION"
 
 if [ -z "$AUTOBUILD" ] ; then 
-    fail
+    exit 1
 fi
 
 if [ "$OSTYPE" = "cygwin" ] ; then
@@ -23,12 +23,9 @@ else
 fi
 
 # load autbuild provided shell functions and variables
-set +x
-eval "$("$autobuild" source_environment)"
-set -x
-
-# set LL_BUILD and friends
-set_build_variables convenience Release
+source_environment_tempfile="$stage/source_environment.sh"
+"$autobuild" source_environment > "$source_environment_tempfile"
+. "$source_environment_tempfile"
 
 stage="$(pwd)/stage"
 
@@ -45,7 +42,7 @@ pushd "$JPEGLIB_SOURCE_DIR"
                     target="setup-v12"
                     ;;
                 *)
-                    fail "Unrecognized AUTOBUILD_VSVER = '${AUTOBUILD_VSVER:-}'"
+                    echo "Unrecognized AUTOBUILD_VSVER = '${AUTOBUILD_VSVER:-}'" 1>&2 ; exit 1
                     ;;
             esac
 
@@ -64,7 +61,7 @@ pushd "$JPEGLIB_SOURCE_DIR"
             cp {jconfig.h,jerror.h,jinclude.h,jmorecfg.h,jpeglib.h} "$stage/include/jpeglib"
         ;;
         darwin*)
-            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD"
+            opts="-arch $AUTOBUILD_CONFIGURE_ARCH $LL_BUILD_RELEASE"
             export CFLAGS="$opts" 
             export CPPFLAGS="$opts" 
             export LDFLAGS="$opts"
@@ -78,7 +75,7 @@ pushd "$JPEGLIB_SOURCE_DIR"
             mv "$stage/include/"*.h "$stage/include/jpeglib/"
         ;;
         linux*)
-            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD"
+            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
             CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage"
             make
             make install
@@ -92,6 +89,3 @@ pushd "$JPEGLIB_SOURCE_DIR"
     mkdir -p "$stage/LICENSES"
     cp README "$stage/LICENSES/jpeglib.txt"
 popd
-
-pass
-
