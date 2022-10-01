@@ -78,7 +78,7 @@ pushd "$JPEGLIB_SOURCE_DIR"
             mv "$stage/include/"*.h "$stage/include/jpeglib/"
         ;;
         linux*)
-            opts="-m$AUTOBUILD_ADDRSIZE $LL_BUILD_RELEASE"
+            opts="${AUTOBUILD_GCC_ARCH} $LL_BUILD_RELEASE"
             CFLAGS="$opts" CXXFLAGS="$opts" ./configure --prefix="$stage"
             make
             make install
